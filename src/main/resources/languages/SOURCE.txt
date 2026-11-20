@@ -1,0 +1,6 @@
+Monkeytype word lists (GPL-3.0), https://github.com/monkeytypegame/monkeytype
+commit 78a22fdbb94d3a48b879e49e38e6c2d80cd5a60f
+path frontend/static/languages/<name>.json
+kept: natural languages; dropped code_*, novelty lists, rightToLeft, joiningScript, non Latin/Cyrillic/Greek scripts
+bundled: lists up to 102400 bytes (reduced to name, orderedByFrequency, words); larger lists are downloaded on demand
+also dropped: docker_file (not a natural language)

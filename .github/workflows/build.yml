@@ -1,0 +1,37 @@
+name: Build
+
+# Development build: every push and pull request builds the jar and uploads it as a workflow artifact.
+on:
+  push:
+    branches: ["**"]
+    tags-ignore: ["v*"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Set dev version
+        run: echo "BT_VERSION=dev-${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+
+      - name: Test and build
+        run: ./gradlew --no-daemon test jar
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: blockytype-${{ env.BT_VERSION }}
+          path: build/libs/blockytype-*.jar
+          if-no-files-found: error
+          retention-days: 90

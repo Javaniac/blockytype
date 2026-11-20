@@ -1,0 +1,14 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%gray(%d{yyyy-MM-dd HH:mm:ss}) %highlight(%-5level) %cyan(%-18logger{0}) %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Exposed logs every SQL statement at DEBUG. -->
+    <logger name="Exposed" level="INFO"/>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>
