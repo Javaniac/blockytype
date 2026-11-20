@@ -46,8 +46,8 @@ bin/
 ### BlockyType runtime ###
 *.db
 *.db-journal
-fonts/
-run/
+/fonts/
+/run/
 /libraries/
 /languages/
 /sounds/
@@ -60,3 +60,4 @@ run/
 .idea/dataSources.xml
 .idea/dataSources.local.xml
 .claude/settings.local.json
+.idea/vcs.xml
