@@ -1,0 +1,14 @@
+Sounds of the sound settings (play sound on click / on error / time warning).
+
+Origin: Monkeytype, https://github.com/monkeytypegame/monkeytype
+  frontend/static/sounds/  at commit 78a22fdbb94d3a48b879e49e38e6c2d80cd5a60f
+  click1..7, click14..26 (sample sets), error1..4, timeWarning.wav
+
+Changes: converted from WAV to Ogg Vorbis (mono, 44.1 kHz, quality 2) because Minecraft only plays Ogg Vorbis.
+The click sets 8..13 (sine, sawtooth, square, triangle, pentatonic, wholetone) are generated in Monkeytype's
+code (sound-controller.ts); here they are short synthesized notes (click8..11: 14 notes of a C major scale from
+C4, 0.3 s; click12/13: two octaves of the scale from C5, 0.8 s) made with ffmpeg's aevalsrc.
+
+License: the Monkeytype repository is GPL-3.0. It has no separate license or credits file for the audio files,
+so their origin and license are not known beyond that. Replace or remove them if that is a problem for you.
+index.txt lists the files and is read by the server to build the resource pack's sounds.json.

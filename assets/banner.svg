@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="720" height="200">
+  <title>BlockyType</title>
+  <rect width="720" height="200" rx="16" fill="#323437"/>
+  <g transform="translate(40 40) scale(15)" shape-rendering="crispEdges">
+    <rect x="1" y="0" width="6" height="1" fill="#E2B714"/>
+    <rect x="0" y="1" width="1" height="1" fill="#E2B714"/>
+    <rect x="1" y="1" width="4" height="1" fill="#323437"/>
+    <rect x="5" y="1" width="3" height="1" fill="#E2B714"/>
+    <rect x="0" y="2" width="1" height="1" fill="#E2B714"/>
+    <rect x="1" y="2" width="1" height="1" fill="#323437"/>
+    <rect x="2" y="2" width="3" height="1" fill="#E2B714"/>
+    <rect x="5" y="2" width="1" height="1" fill="#323437"/>
+    <rect x="6" y="2" width="2" height="1" fill="#E2B714"/>
+    <rect x="0" y="3" width="1" height="1" fill="#E2B714"/>
+    <rect x="1" y="3" width="4" height="1" fill="#323437"/>
+    <rect x="5" y="3" width="3" height="1" fill="#E2B714"/>
+    <rect x="0" y="4" width="1" height="1" fill="#E2B714"/>
+    <rect x="1" y="4" width="1" height="1" fill="#323437"/>
+    <rect x="2" y="4" width="3" height="1" fill="#E2B714"/>
+    <rect x="5" y="4" width="1" height="1" fill="#323437"/>
+    <rect x="6" y="4" width="2" height="1" fill="#E2B714"/>
+    <rect x="0" y="5" width="1" height="1" fill="#E2B714"/>
+    <rect x="1" y="5" width="1" height="1" fill="#323437"/>
+    <rect x="2" y="5" width="3" height="1" fill="#E2B714"/>
+    <rect x="5" y="5" width="1" height="1" fill="#323437"/>
+    <rect x="6" y="5" width="2" height="1" fill="#E2B714"/>
+    <rect x="0" y="6" width="1" height="1" fill="#E2B714"/>
+    <rect x="1" y="6" width="4" height="1" fill="#323437"/>
+    <rect x="5" y="6" width="3" height="1" fill="#E2B714"/>
+    <rect x="1" y="7" width="6" height="1" fill="#E2B714"/>
+  </g>
+  <text x="200" y="108" font-family="'JetBrains Mono', 'Fira Code', Consolas, monospace" font-size="64" font-weight="700" fill="#D1D0C5">Blocky<tspan fill="#E2B714">Type</tspan></text>
+  <text x="202" y="150" font-family="'JetBrains Mono', 'Fira Code', Consolas, monospace" font-size="22" fill="#646669">a typing test inside Minecraft</text>
+</svg>

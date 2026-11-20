@@ -1,0 +1,53 @@
+name: Sound assets
+
+# Publishes assets/sounds as sounds.zip to the release that SoundDownloader.DEFAULT_URL points to.
+# When the sounds change: bump the `assets-N` tag in SoundDownloader.DEFAULT_URL and DEFAULT_SHA256, push.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["assets/sounds/**", "src/main/kotlin/com/javaniac/blockytype/sound/SoundDownloader.kt"]
+
+permissions:
+  contents: write
+
+jobs:
+  sounds:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build sounds.zip
+        run: ./gradlew --no-daemon soundsZip
+
+      - name: Check the pinned SHA-256 and tag
+        run: |
+          src=src/main/kotlin/com/javaniac/blockytype/sound/SoundDownloader.kt
+          pinned=$(grep -oP 'DEFAULT_SHA256 = "\K[0-9a-f]{64}' "$src")
+          actual=$(sha256sum build/assets-release/sounds.zip | cut -d' ' -f1)
+          tag=$(grep -oP 'releases/download/\K[^/]+(?=/sounds.zip)' "$src")
+          echo "pinned $pinned"; echo "actual $actual"; echo "tag $tag"
+          if [ "$pinned" != "$actual" ]; then
+            echo "::error::SoundDownloader.DEFAULT_SHA256 does not match the built sounds.zip"
+            exit 1
+          fi
+          echo "ASSET_TAG=$tag" >> "$GITHUB_ENV"
+
+      - name: Publish release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$ASSET_TAG" >/dev/null 2>&1; then
+            gh release upload "$ASSET_TAG" build/assets-release/sounds.zip --clobber
+          else
+            gh release create "$ASSET_TAG" build/assets-release/sounds.zip \
+              --title "Assets ($ASSET_TAG)" --prerelease \
+              --notes "Sound pack downloaded by the server on first start. Not a server release."
+          fi
