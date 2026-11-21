@@ -1,5 +1,6 @@
 package com.javaniac.blockytype.events.game
 
+import com.javaniac.blockytype.net.ArrivalPlayer
 import com.javaniac.blockytype.BlockyType
 import com.javaniac.blockytype.game.CommandSuggest
 import com.javaniac.blockytype.game.PlayerMenuHost
@@ -78,6 +79,7 @@ object GameEvents {
             val packet = e.packet
             if (packet !is ClientTabCompletePacket) return@addListener
             e.isCancelled = true
+            val arrived = (e.player as? ArrivalPlayer)?.takeArrival(packet) ?: System.nanoTime()
             val s = Sessions[e.player] ?: return@addListener
             val text = packet.text()
             if (s.edit != null) {
@@ -100,7 +102,7 @@ object GameEvents {
             } else if (!text.startsWith(PREFIX)) {
                 s.cancel()
             } else {
-                s.onInput(text.substring(PREFIX.length))
+                s.onInput(text.substring(PREFIX.length), arrived)
             }
         }
 

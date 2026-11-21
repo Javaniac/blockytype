@@ -127,6 +127,29 @@ class TypingTestTest {
     }
 
     @Test
+    fun `clock expiry waits one tick so keys queued before the deadline still count`() {
+        val test = timeTest(15)
+        test.type("ab", startMs = 0, stepMs = 100) // starts at 0, deadline 15 s
+        // the clock task runs 10 ms after the deadline, before the queued key (stamped 14.99 s) is applied
+        test.expireClock(15 * sec + 10 * ms)
+        assertEquals(TypingTest.State.RUNNING, test.state)
+        assertEquals(TypingTest.Outcome.ACCEPTED, test.apply("ab ", 15 * sec - 10 * ms))
+        assertEquals("ab ", test.typed)
+        // a full tick later the test ends at exactly the limit
+        test.expireClock(15 * sec + TypingTest.EXPIRE_LAG_NANOS)
+        assertEquals(TypingTest.State.FINISHED, test.state)
+        assertEquals(15_000L, test.durationMs())
+    }
+
+    @Test
+    fun `a key stamped after the deadline is still rejected under the lag`() {
+        val test = timeTest(15)
+        test.type("ab", startMs = 0, stepMs = 100)
+        assertEquals(TypingTest.Outcome.REJECTED, test.apply("ab ", 15 * sec + 10 * ms))
+        assertEquals("ab", test.typed)
+    }
+
+    @Test
     fun `expire does nothing before the start or in words mode`() {
         val ready = timeTest(15)
         ready.expire(100 * sec)

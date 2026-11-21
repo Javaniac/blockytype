@@ -83,6 +83,20 @@ class TypingTest(
         if (state != State.RUNNING || nowNanos < deadline) return
         state = State.FINISHED
         endNanos = deadline
+        repairKeyTimes()
+    }
+
+    /**
+     * [expire] for the clock task: it waits one tick ([EXPIRE_LAG_NANOS]) past the deadline, so keys that arrived
+     * before the deadline but are still queued are applied first. The duration is still exactly the limit.
+     */
+    fun expireClock(nowNanos: Long) = expire(nowNanos - EXPIRE_LAG_NANOS)
+
+    /** Once the test is over: undo lag-spike bursts in the key times (see [KeyTimes]). */
+    private fun repairKeyTimes() {
+        val fixed = KeyTimes.deburst(keys)
+        keys.clear()
+        keys.addAll(fixed)
     }
 
     private fun ensureAhead() {
@@ -195,6 +209,7 @@ class TypingTest(
         state = State.FINISHED
         endNanos = nowNanos
         failure = reason
+        repairKeyTimes()
     }
 
     /** Whether the word of [length] chars that was just submitted at [ms] was typed below the burst limit. */
@@ -302,6 +317,9 @@ class TypingTest(
 
         /** Letters a word may be typed past its end (Monkeytype limit). */
         const val MAX_EXTRA = 20
+
+        /** One server tick: keys stamped before the deadline may still be queued when the clock task runs. */
+        const val EXPIRE_LAG_NANOS = 50_000_000L
 
         /** Words a time test keeps generated ahead of the typist (Monkeytype generates 100 and tops up). */
         const val AHEAD = 100

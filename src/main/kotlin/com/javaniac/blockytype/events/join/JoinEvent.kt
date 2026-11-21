@@ -10,6 +10,8 @@ import com.javaniac.blockytype.game.HiddenHudNotice
 import com.javaniac.blockytype.game.Sessions
 import com.javaniac.blockytype.game.TestSession
 import com.javaniac.blockytype.game.TypingCommandTree
+import com.javaniac.blockytype.net.ArrivalPlayer
+import com.javaniac.blockytype.net.PingNotice
 import net.minestom.server.MinecraftServer
 import net.minestom.server.timer.TaskSchedule
 import net.minestom.server.entity.Entity
@@ -58,6 +60,12 @@ object JoinEvent: EventListener<PlayerSpawnEvent> {
         // Let the pack and HUD settle, then read the player's keybinds.
         MinecraftServer.getSchedulerManager().buildTask { if (player.isOnline) session.startKeybindProbe() }
             .delay(TaskSchedule.seconds(3)).schedule()
+
+        // Warn about a high ping once the keepalive answers have measured it.
+        MinecraftServer.getSchedulerManager().buildTask {
+            val rtt = (player as? ArrivalPlayer)?.rtt?.snapshot()
+            if (player.isOnline && PingNotice.warns(rtt)) player.sendMessage(PingNotice.message(session.theme, rtt!!.median))
+        }.delay(TaskSchedule.seconds(PingNotice.DELAY_SECONDS)).schedule()
 
         session.startKeybindPoll()
         BlockyType.launch {

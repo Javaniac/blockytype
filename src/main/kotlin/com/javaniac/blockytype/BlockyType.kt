@@ -1,5 +1,7 @@
 package com.javaniac.blockytype
 
+import com.javaniac.blockytype.net.ArrivalPlayer
+import com.javaniac.blockytype.net.KeepAlive
 import com.javaniac.blockytype.commands.GrantAdminCommand
 import com.javaniac.blockytype.commands.PackCommand
 import com.javaniac.blockytype.commands.RevokeAdminCommand
@@ -77,6 +79,7 @@ object BlockyType: CoroutineScope {
 
     @JvmStatic
     fun main(args: Array<String>) {
+        KeepAlive.configure() // before anything reads Minestom's ServerProperties
         FontRegistry.init()
         Storage.init()
         ServerConfig.loadAdmins(runBlocking { Storage.admins() }.map { it.uuid })
@@ -94,6 +97,7 @@ object BlockyType: CoroutineScope {
 
         val server = MinecraftServer.init(Auth.Online())
         ServerBrand.install()
+        MinecraftServer.getConnectionManager().setPlayerProvider { connection, profile -> ArrivalPlayer(connection, profile) }
         packServer.start()
         MinecraftServer.getCommandManager().register(PackCommand)
         MinecraftServer.getCommandManager().register(SettingsCommand)

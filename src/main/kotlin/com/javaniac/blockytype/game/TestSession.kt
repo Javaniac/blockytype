@@ -529,7 +529,7 @@ class TestSession(
     /** Every tick of a running time test: ends it at the deadline, redraws when the countdown changes. */
     private fun tickTime() {
         val now = System.nanoTime()
-        test.expire(now)
+        test.expireClock(now)
         if (test.state == TypingTest.State.FINISHED) {
             if (result == null) finish()
             return
@@ -551,6 +551,7 @@ class TestSession(
         timer?.cancel()
         timer = null
         shownRemaining = -1
+        resync.reset()
         created = TestFactory.create(::effective)
         warning = TimeWarning(Sounds.warningSeconds(effective("play-time-warning")))
         val hadResult = result != null
@@ -646,10 +647,25 @@ class TestSession(
         if (test.keys.last().correct) playClick(input.last()) else playError()
     }
 
-    /** Applies the text of the command box (without `/t `). */
-    fun onInput(input: String) {
+    /** Drops edits made on text the server already rewrote (see [ResyncGate]). */
+    private val resync = ResyncGate()
+
+    /** Last key stamp, so the stamps handed to the test never go backwards. */
+    private var lastStamp = 0L
+
+    /**
+     * Applies the text of the command box (without `/t `). [arrivedNanos] is when the packet came in on the
+     * network thread (`ArrivalPlayer`), not when this tick handles it, so lag and the tick step do not move it.
+     */
+    fun onInput(input: String, arrivedNanos: Long = System.nanoTime()) {
+        val stamp = maxOf(arrivedNanos, lastStamp)
+        lastStamp = stamp
+        when (resync.check(input, stamp)) {
+            ResyncGate.Verdict.DROP, ResyncGate.Verdict.ECHO -> return
+            ResyncGate.Verdict.PASS -> {}
+        }
         val keysBefore = test.keys.size
-        val outcome = test.apply(input, System.nanoTime())
+        val outcome = test.apply(input, stamp)
         keySounds(input, keysBefore)
         when (outcome) {
             TypingTest.Outcome.UNCHANGED -> return
@@ -763,6 +779,7 @@ class TestSession(
 
     /** Writes `/t ` + the accepted text into the box (also resyncs it after a rejected edit). */
     fun prefill() {
+        resync.expect(test.typed, System.nanoTime())
         player.sendPacket(
             BlockEntityDataPacket(
                 blockPos, BlockEntityType.COMMAND_BLOCK,
